@@ -1,0 +1,5 @@
+create a analog ticking clock
+create an alarm that takes your input and sets the alarm
+alarm can also take a description which will also serve as a reminder
+when alarm time is due, the backgund image changes and there is a bell images animating from left to right
+there will be a sound inserted into the application when the alrm goes off
