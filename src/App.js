@@ -13,14 +13,14 @@ const App = () => {
   const [hourErrorMsg, setHourErrorMsg] = useState(); //hour error message
   const [minErrorMsg, setminErrorMsg] = useState(); // min error message
   const [amPmErrorMsg, setAmPmMsg] = useState(''); //ampm error message
-  const [tunes, setTunes] = useState({});
+  const [tunes, setTunes] = useState({}); // contains all alarm tunes
   const [alarmTune, setAlarmTune] = useState('/audio/Beep.mp3'); // Selected alarm tune
   const [isAlarmDue, setIsAlarmDue] = useState(false); // checks if alarm is due with current time
   const [dueAlarmTime, setDueAlarmTime] = useState(); // alarm time that is currently due with current time
   const [isAlarmSet, setIsAlarmSet] = useState(false); //checks if alarm have been set so to change the main 
   const [fixedAlarm, setFixedAlarm] = useState([])  // where "set" alarm deatils are kept
-  const [description, setDescription] = useState('');
-  const [alarmTimeLeft, setAlarmTimeLeft] = useState({}) // Time left for the alarm to go off
+  const [description, setDescription] = useState('');  // inputed descrpition by user
+  const [alarmTimeLeft, setAlarmTimeLeft] = useState() // Time left for the alarm to go off
   const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString()) // sets current time
   class Alarm { // create object for every alarm the user set
     constructor(hour, min, ampm, description) {
@@ -45,7 +45,7 @@ const App = () => {
   var date = new Date();
   var time = date.toLocaleTimeString();
   var main; // page before and after you set the alarm
-  var mainChange; // page when the alarm ahs gone off
+  var mainChange; // page when the alarm has gone off
   useEffect(
     () => {
       let tickInterval = setInterval(() => {
@@ -93,17 +93,6 @@ const App = () => {
       let min = date.getMinutes().toString()
       let ampm;
 
-      // if (Number(hour) > 12) {  //convert hour to a 12 hour value
-      //   ampm = 'PM'
-      //   hour = Number(hour) - 12
-      //   hour = '0' + hour.toString()
-      // } else {
-      //   ampm = 'AM'
-      //   hour = '0' + hour
-      // }
-      // if (Number(min) < 10) {
-      //   min = '0' + min
-      // }
       fixedAlarm.forEach((alarm, i) => {
         if (alarm.hour.length === 1 && alarm.hour < 10 && Number(hour) >= 12) {
           ampm = 'PM'
@@ -200,7 +189,7 @@ const App = () => {
     if (hourCheck && minCheck && amPmCheck) { // excute code if all hour,min,amPm input are valid
       if (fixedAlarm.length < 12) {
         fixedAlarm.push(new Alarm(alarmHour, alarmMin, amPm, description))
-        calAlarmTime();
+        calAlarmTime.calculate();
         setminErrorMsg();
         setDescription()
         setHourErrorMsg();
@@ -220,85 +209,80 @@ const App = () => {
 
     }
   }
-  function calAlarmTime() {// this calculate the time left for the alram to go off
-    var globalHour = getHour();
-    var globalMin = getMin();
-    var furHour;
-    function getHour() {
-      let hour = date.getHours();
-      let min = date.getMinutes();
-      let numAlarmHour = parseInt(alarmHour);
-
-      if (amPm === 'PM' && hour > 12) {
-        numAlarmHour = numAlarmHour + 12
-        console.log("PM ONLY")
-        if (numAlarmHour < hour) {
-          furHour = min === 0 ? 24 - (hour - numAlarmHour) : (24 - (hour - numAlarmHour));
-        } else if (numAlarmHour > hour) {
-          if (min === 0 || (numAlarmHour - hour) >= 2) {
-            furHour = numAlarmHour - hour
-          } else {
-            furHour = (numAlarmHour - hour) - 1
-          }
+  var calAlarmTime = {  // this calculate the time left for the alram to go off
+    currentHour: date.getHours(),
+    currentMin: date.getMinutes(),
+    convertStringToDigit: function (string) { return parseFloat(string) },
+    convertDigitToString: function (digit) { return digit.toString() },
+    convertTo12Hour: function (time) { return time - 12 },
+    convertTo24Hour: function (time) {
+      let result;
+      if (amPm === "PM" && time < 12) {
+       result = time + 12
+      }else if (amPm === "AM" && time === 12) {
+        result = 0
+      }else {
+        result = time
+      }
+      return result
+     },
+    ConvertToAbsoluteMinute: function (hour, min) { return (hour * 60) + min },
+    convertToHourMin: function (time) {
+      let hour;
+      let min;
+      let figure = this.convertDigitToString(time / 60);
+      let figureArray = figure.split(".");
+      console.log(figureArray);
+      if (figureArray.length === 0) {
+        hour = this.convertStringToDigit(figureArray[0]);
+        min = 0
+      } else {
+        hour = this.convertStringToDigit(figureArray[0]);
+        min = this.convertStringToDigit(`.${figureArray[1]}`) * 60
+        let strMin = this.convertDigitToString(min)
+        if (strMin.indexOf(".") >= 0){
+          min = this.convertStringToDigit(strMin.split(".")[0]);
+          console.log("second was solved");
         }
-      } else if (amPm === 'AM' && hour < 12) {
-        console.log("AM ONLY")
-        if (hour > numAlarmHour) {
-          furHour = min === 0 ? 24 - (hour - numAlarmHour) : (24 - (hour - numAlarmHour)) - 1
-        } else if (hour < numAlarmHour) {
-          furHour = min === 0 ? numAlarmHour - hour : (numAlarmHour - hour) - 1
-        }
-      } else if (amPm === "AM" && hour > 12) {
-        furHour = min === 0 ? (24 - hour) + numAlarmHour : ((24 - hour) + numAlarmHour) - 1
-        console.log("AM AND PM")
-      } else if (amPm === "PM" && hour < 12) {
-        furHour = min === 0 ? (24 - (hour + 12)) + numAlarmHour : ((24 - (hour + 12)) + numAlarmHour) - 1
       }
-      return furHour
+      console.log(hour, min)
+      return { hour, min }
+    },
+    newDay: function () {
+      let hour = (alarmHour === "12" && this.currentHour === 0) ? 0 : this.convertStringToDigit(alarmHour);
+      let alarmHourDigit = this.convertTo24Hour(this.convertStringToDigit(alarmHour));
+      let alarmMinDigit = this.convertStringToDigit(alarmMin);
+      let absoluteAlarmTime = this.ConvertToAbsoluteMinute(alarmHourDigit, alarmMinDigit);
+      let absoluteCurrentTime = this.ConvertToAbsoluteMinute(this.currentHour, this.currentMin);
+      if (absoluteAlarmTime >= absoluteCurrentTime) {
+        return false
+      } else {
+        return true
+      }
+    },
+    calculate: function () {
+      let alarmHourDigit = this.convertTo24Hour(this.convertStringToDigit(alarmHour));
+      let alarmMinDigit = this.convertStringToDigit(alarmMin);
+      let absoluteAlarmTime = this.ConvertToAbsoluteMinute(alarmHourDigit, alarmMinDigit);
+      let absoluteCurrentTime = this.ConvertToAbsoluteMinute(this.currentHour, this.currentMin);
+      let absolute24Hour = this.ConvertToAbsoluteMinute(24, 0);
+      let result;
+      if (this.newDay()) {
+        result = (absolute24Hour - absoluteCurrentTime) + absoluteAlarmTime
+      } else {
+        result = (absoluteAlarmTime >= absoluteCurrentTime) ? absoluteAlarmTime - absoluteCurrentTime
+          : absoluteCurrentTime - absoluteAlarmTime
+      }
+      console.log(this.convertToHourMin(result));
+       setAlarmTimeLeft(this.convertToHourMin(result));
     }
-    function getMin() {
-      let min = date.getMinutes();
-      let numAlarmMin = parseInt(alarmMin);
-      var furMin;
-      if (furHour === 0 && numAlarmMin === 0) {
-        furMin = 60 - min
-        console.log("here 1")
-      } else if (furHour === 0 && ((60 - min) + numAlarmMin) > 60) {
-        furMin = ((60 - min) + numAlarmMin) - 60
-        globalHour = 1;
-        console.log("here 3")
-
-      }else if (furHour === 0 && ((60 - min) + numAlarmMin) < 60){
-        furMin = min + numAlarmMin
-       }
-      else if (furHour === 0 && min > numAlarmMin) {
-        furMin = min + numAlarmMin
-        console.log("here 2")
-      } else if (furHour === 0 && numAlarmMin > min) {
-        furHour = min + numAlarmMin
-      }
-      else if (min > numAlarmMin) {
-        furMin = min - numAlarmMin
-      }
-      else if (numAlarmMin > min) {
-        furMin = numAlarmMin - min
-      }
-      
-
-      return furMin
-    }
-    console.log(globalHour);
-    setAlarmTimeLeft({
-      hour: globalHour,
-      min: globalMin
-    });
-
   }
+
   function removeAlarm(index) {
     fixedAlarm.splice(index, 1);
   }
   function reset() {
-    setAlarmTimeLeft({});
+    setAlarmTimeLeft();
     setAmPm('');
     setAlarmTune('/audio/Beep.mp3')
     setHour('')
@@ -356,5 +340,4 @@ const App = () => {
     </div>
   )
 };
-
 export default App;

@@ -150,16 +150,20 @@
     display: none;
   }
   #hour-error{
-    left: 484px;
-    top: 155px;
+    left: -36px;
+    top: 212px;
+    font-size: 8px;
   }
   #min-error{
-    left: 810px;
-    top: 155px;
+    left: 208px;
+    top: 212px;
+    font-size: 8px;
+    
   }
   #ampm-error{
-    left: 773px;
-    top: 213px;
+    left: 166px;
+    top: 265px;
+    font-size: 8px;
   }
   .sec3{
     display: none;
@@ -233,6 +237,42 @@
     background-color: #108fac;
   }
 
+  @media (min-width: 375px) {
+    #hour-error{
+      left: -20px;
+      top: 213px;
+      font-size: 10px;
+    }
+    #min-error{
+      left: 246px;
+      top: 212px;
+      font-size: 10px;
+      
+    }
+    #ampm-error{
+      left: 203px;
+      top: 265px;
+      font-size: 10px;
+    }
+  }
+  @media (min-width: 425px) {
+    #hour-error{
+      left: -2px;
+      top: 213px;
+      font-size: 12px;
+    }
+    #min-error{
+      left: 275px;
+      top: 212px;
+      font-size: 12px;
+      
+    }
+    #ampm-error{
+      left: 238px;
+      top: 265px;
+      font-size: 12px;
+    }
+  }
   @media (min-width: 768px) {
     #logo{
       height: 10%;
@@ -242,5 +282,59 @@
       width:30%;
       height: 30%;
     }
+    #hour-error{
+      left: 161px;
+      top: 213px;
+      font-size: 12px;
+    }
+    #min-error{
+      left: 460px;
+      top: 212px;
+      font-size: 12px;
+      
+    }
+    #ampm-error{
+      left: 406px;
+      top: 265px;
+      font-size: 12px;
+    }
   }
+  @media (min-width: 1024px) {
+    #hour-error{
+      left: 289px;
+      top: 213px;
+      font-size: 12px;
+    }
+    #min-error{
+      left: 582px;
+      top: 212px;
+      font-size: 12px;
+      
+    }
+    #ampm-error{
+      left: 537px;
+      top: 265px;
+      font-size: 12px;
+    }
+  }
+  @media (min-width: 1440px) {
+    #hour-error{
+      left: 495px;
+      top: 213px;
+      font-size: 12px;
+    }
+    #min-error{
+      left: 797px;
+      top: 212px;
+      font-size: 12px;
+      
+    }
+    #ampm-error{
+      left: 743px;
+      top: 265px;
+      font-size: 12px;
+    }
+  }
+  
+
   
