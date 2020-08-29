@@ -2,7 +2,6 @@ import React, { useEffect } from 'react'
 import gsap from 'gsap'
 var audio;
 const AlarmGoneOff = (props) => {
-    console.log('alarm re-rendering')
     if (props.isAlarmDue) {
         document.body.style.backgroundImage = `url("/img/bgImage.jpg")`
     }

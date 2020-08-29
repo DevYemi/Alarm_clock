@@ -237,6 +237,12 @@
     background-color: #108fac;
   }
 
+  /* AlarmSet (Alarm is set) */
+  .alarmSet {
+    text-align: center;
+    margin-top: 5em;
+  }
+
   @media (min-width: 375px) {
     #hour-error{
       left: -20px;

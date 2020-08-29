@@ -10,7 +10,6 @@ const MainContent = (props) => {
             let inputMin = document.querySelector('.min');
             let amPm = document.getElementById('ampm-error');
             if (props.hourErrorMsg) {
-                console.log(props.hourErrorMsg)
                 hour.style.display = 'block'
                 inputHour = document.querySelector('.hour')
                 inputHour.style.borderColor = 'red'
@@ -69,20 +68,15 @@ const MainContent = (props) => {
         if (grid.childElementCount <= 0) {
             sec3.style.display = 'none'
         }
-        console.log( index,  grid.children.length)
         if ( grid.children.length === index) {
             props.removeAlarm(index);
-            console.log('last index')
-            console.log(props.fixedAlarm)
         } else {
             for (let i = index; i < grid.children.length; i++) {
-                console.log('previous index');
                 const element = grid.children[i];
                 let classIndex = element.classList.item(1)
                 element.classList.remove(classIndex);
                 let newClasssIndex = (parseInt(classIndex) - 1).toString()
                 element.classList.add(newClasssIndex);
-                console.log(props.fixedAlarm)
             }
             props.removeAlarm(index);
         }
